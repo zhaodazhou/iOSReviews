@@ -12,6 +12,15 @@ Consider the past, and you shall know the future.
 ###线程
 线程是比进程还小的单位，因为进程的切换所耗费的资源相对比较大，所以就有了线程这个东西。一个进程中可以有多个线程。
 
+
+####RunLoop
+
+官方定义
+```
+A run loop is an event processing loop that you use to schedule work and coordinate the receipt of incoming events. The purpose of a run loop is to keep your thread busy when there is work to do and put your thread to sleep when there is none.
+```
+[基本介绍](./runloop.md)。
+
 ####锁
 锁是为了让多线程操作的结果可预期，防止线程间相互影响而产生不可预期的结果。锁的[基本介绍](./lock.md)。
 
