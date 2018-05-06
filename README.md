@@ -7,7 +7,7 @@ Consider the past, and you shall know the future.
 其中“基础”部分的[思维导图](http://naotu.baidu.com/file/946e3aed6dc34ff2336a2cbe3b5338e5?token=1e8e68a9805a0b1b)如下：
 ![](./base.png 'iOS基础的思维导图')
 
-打算按照这个体系，将网上各路大神的文章学习学习，做个笔记。
+打算按照这个体系，将网上各路大神的文章学习，做个笔记。
 
 ###线程
 线程是比进程还小的单位，因为进程的切换所耗费的资源相对比较大，所以就有了线程这个东西。一个进程中可以有多个线程。
@@ -23,4 +23,8 @@ A run loop is an event processing loop that you use to schedule work and coordin
 
 ####锁
 锁是为了让多线程操作的结果可预期，防止线程间相互影响而产生不可预期的结果。锁的[基本介绍](./lock.md)。
+
+####Cache
+
+缓存一般是三级缓存：内存——磁盘——服务，在此做个[记录](./cache.md)。
 
