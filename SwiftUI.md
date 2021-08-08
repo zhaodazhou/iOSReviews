@@ -1054,6 +1054,443 @@ let dateString = formatter.string(from: Date())
 
 ### Day 27
 
+But, as Andre Gide said, “you cannot discover new oceans unless you have the courage to lose sight of the shore.”
+
+#### [Building a basic layout](https://www.hackingwithswift.com/books/ios-swiftui/building-a-basic-layout)
+
+```swift
+struct ContentView: View {
+    @State private var wakeUp = Date()
+    @State private var sleepAmount = 8.0
+    @State private var coffeeAmount = 1
+
+    var body: some View {
+        NavigationView {
+            VStack {
+                Text("When do you want to wake up?")
+                    .font(.headline)
+                DatePicker("Please enter a time", selection: $wakeUp, displayedComponents:.hourAndMinute)
+                    .labelsHidden()
+                
+                Text("Desired amount of sleep")
+                    .font(.headline)
+                Stepper(value: $sleepAmount, in: 4...12, step: 0.25) {
+                    Text("\(sleepAmount, specifier: "%g") hours")
+                }
+                
+                Text("Daily coffee intake")
+                    .font(.headline)
+                Stepper(value: $coffeeAmount, in: 1...20, step: 1) {
+                    if coffeeAmount == 1 {
+                        Text("1 cup")
+                    } else {
+                        Text("\(coffeeAmount) cups")
+                    }
+                }
+            }
+            
+            .navigationTitle("BetterRest")
+            .navigationBarItems(trailing:
+                                    HStack {
+                                        Button("Calculate") {
+                                            self.calculateBedtime()
+                                        }
+                                        
+                                        Button(action: calculateBedtime, label: {
+                                            Text("Calculate")
+                                        })
+                                        
+                                        Button(action: calculateBedtime) {
+                                            Text("Calculate")
+                                        }
+                                    }
+            )
+        }
+    }
+    
+    func calculateBedtime() {
+        
+        
+    }
+}
+```
+
+
+
+#### [Connecting SwiftUI to Core ML](https://www.hackingwithswift.com/books/ios-swiftui/connecting-swiftui-to-core-ml)
+
+```swift
+struct ContentView: View {
+    @State private var wakeUp = Date()
+    @State private var sleepAmount = 8.0
+    @State private var coffeeAmount = 1
+    
+    @State private var alertTitle = ""
+    @State private var alertMessage = ""
+    @State private var showingAlert = false
+
+    var body: some View {
+        NavigationView {
+            VStack {
+                Text("When do you want to wake up?")
+                    .font(.headline)
+                DatePicker("Please enter a time", selection: $wakeUp, displayedComponents:.hourAndMinute)
+                    .labelsHidden()
+                
+                Text("Desired amount of sleep")
+                    .font(.headline)
+                Stepper(value: $sleepAmount, in: 4...12, step: 0.25) {
+                    Text("\(sleepAmount, specifier: "%g") hours")
+                }
+                
+                Text("Daily coffee intake")
+                    .font(.headline)
+                Stepper(value: $coffeeAmount, in: 1...20, step: 1) {
+                    if coffeeAmount == 1 {
+                        Text("1 cup")
+                    } else {
+                        Text("\(coffeeAmount) cups")
+                    }
+                }
+            }
+            
+            .navigationTitle("BetterRest")
+            .navigationBarItems(trailing:
+                                    Button(action: calculateBedtime) {
+                                        Text("Calculate")
+                                    }
+            )
+            .alert(isPresented: $showingAlert) {
+                Alert(title: Text(alertTitle), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+            }
+        }
+    }
+    
+    func calculateBedtime() {
+        let model = SleepCalculator()
+        
+        let components = Calendar.current.dateComponents([.hour, .minute], from: wakeUp)
+        let hour = (components.hour ?? 0) * 60 * 60
+        let minute = (components.minute ?? 0) * 60
+        
+        do {
+            let prediction = try model.prediction(wake: Double(hour + minute), estimatedSleep: sleepAmount, coffee: Double(coffeeAmount))
+            let sleepTime = wakeUp - prediction.actualSleep
+
+            let formatter = DateFormatter()
+            formatter.timeStyle = .short
+
+            alertMessage = formatter.string(from: sleepTime)
+            alertTitle = "Your ideal bedtime is…"
+            showingAlert = true
+
+        } catch {
+            alertTitle = "Error"
+            alertMessage = "Sorry, there was a problem calculating your bedtime."
+            showingAlert = true
+
+        }
+    }
+}
+```
+
+
+
+#### Cleaning up the user interface
+
+```swift
+struct ContentView: View {
+    @State private var wakeUp = defaultWakeTime
+    @State private var sleepAmount = 8.0
+    @State private var coffeeAmount = 1
+    
+    @State private var alertTitle = ""
+    @State private var alertMessage = ""
+    @State private var showingAlert = false
+    
+    static var defaultWakeTime: Date {
+        var components = DateComponents()
+        components.hour = 7
+        components.minute = 0
+        return Calendar.current.date(from: components) ?? Date()
+    }
+
+    var body: some View {
+        NavigationView {
+            Form {
+                VStack(alignment: .leading, spacing: 0) {
+                    
+                    Text("When do you want to wake up?")
+                        .font(.headline)
+                    DatePicker("Please enter a time", selection: $wakeUp, displayedComponents:.hourAndMinute)
+                        .labelsHidden()
+                        .datePickerStyle(WheelDatePickerStyle())
+                    
+                }
+                
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Desired amount of sleep")
+                        .font(.headline)
+                    Stepper(value: $sleepAmount, in: 4...12, step: 0.25) {
+                        Text("\(sleepAmount, specifier: "%g") hours")
+                    }
+                }
+                
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Daily coffee intake")
+                        .font(.headline)
+                    Stepper(value: $coffeeAmount, in: 1...20, step: 1) {
+                        if coffeeAmount == 1 {
+                            Text("1 cup")
+                        } else {
+                            Text("\(coffeeAmount) cups")
+                        }
+                    }
+                }
+            }
+            
+            .navigationTitle("BetterRest")
+            .navigationBarItems(trailing:
+                                    Button(action: calculateBedtime) {
+                                        Text("Calculate")
+                                    }
+            )
+            .alert(isPresented: $showingAlert) {
+                Alert(title: Text(alertTitle), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+            }
+        }
+    }
+    
+    func calculateBedtime() {
+        let model = SleepCalculator()
+        
+        let components = Calendar.current.dateComponents([.hour, .minute], from: wakeUp)
+        let hour = (components.hour ?? 0) * 60 * 60
+        let minute = (components.minute ?? 0) * 60
+        
+        do {
+            let prediction = try model.prediction(wake: Double(hour + minute), estimatedSleep: sleepAmount, coffee: Double(coffeeAmount))
+            let sleepTime = wakeUp - prediction.actualSleep
+
+            let formatter = DateFormatter()
+            formatter.timeStyle = .short
+
+            alertMessage = formatter.string(from: sleepTime)
+            alertTitle = "Your ideal bedtime is…"
+        } catch {
+            alertTitle = "Error"
+            alertMessage = "Sorry, there was a problem calculating your bedtime."
+        }
+        showingAlert = true
+    }
+}
+
+```
+
+
+
+https://www.youtube.com/watch?v=a905KIBw1hs This is a video about Create ML for Everyone.
+
+### Day 28
+
+#### BetterRest: Wrap up
+
+1. Change the user interface so that it always shows their recommended bedtime using a nice and large font. You should be able to remove the “Calculate” button entirely.
+
+   ```swift
+   
+   struct GridStack: View {
+       
+       let wakeUp : Date
+       let sleepAmount : Double
+       let coffeeAmount : Int
+       
+       var sleepTime:String {
+           var t = calculateBedtime()
+           return t
+       }
+       
+       var body: some View {
+           Text("\(sleepTime)")
+       }
+       
+       func calculateBedtime() -> String {
+           let model = SleepCalculator()
+           
+           let components = Calendar.current.dateComponents([.hour, .minute], from: wakeUp)
+           let hour = (components.hour ?? 0) * 60 * 60
+           let minute = (components.minute ?? 0) * 60
+           
+           do {
+               let prediction = try model.prediction(wake: Double(hour + minute), estimatedSleep: sleepAmount, coffee: Double(coffeeAmount))
+               let sleepTime = wakeUp - prediction.actualSleep
+   
+               let formatter = DateFormatter()
+               formatter.timeStyle = .short
+   
+               return formatter.string(from: sleepTime)
+           } catch {
+               return "Error"
+           }
+       }
+   }
+   
+   struct ContentView: View {
+       @State private var wakeUp = defaultWakeTime
+       @State private var sleepAmount = 8.0
+       @State private var coffeeAmount = 1
+   
+       
+       static var defaultWakeTime: Date {
+           var components = DateComponents()
+           components.hour = 7
+           components.minute = 0
+           return Calendar.current.date(from: components) ?? Date()
+       }
+   
+       var body: some View {
+           NavigationView {
+               Form {
+                   Section(header: Text("When do you want to wake up?")) {
+                       
+                       DatePicker("Please enter a time", selection: $wakeUp, displayedComponents:.hourAndMinute)
+                           .labelsHidden()
+                           .datePickerStyle(WheelDatePickerStyle())
+                   }
+                   
+                   VStack(alignment: .leading, spacing: 0) {
+                       Text("Desired amount of sleep")
+                           .font(.headline)
+                       Stepper(value: $sleepAmount, in: 4...12, step: 0.25) {
+                           Text("\(sleepAmount, specifier: "%g") hours")
+                       }
+                   }
+                   
+                   VStack(alignment: .leading, spacing: 0) {
+                       Picker("Daily coffee intake", selection: $coffeeAmount) {
+                           ForEach(0 ..< 20) {index in
+                               if index < 1 {
+                                   Text("\(index) cup")
+                               } else {
+                                   Text("\(index) cups")
+                               }
+                           }
+                       }
+                   }
+                   
+                   Section(header: Text("Your ideal bedtime is:").foregroundColor(.green)) {
+                       GridStack(wakeUp: wakeUp, sleepAmount: sleepAmount, coffeeAmount: coffeeAmount).foregroundColor(.green)
+                   }
+               }
+               
+               .navigationTitle("BetterRest")
+           }
+       }
+   }
+   ```
+
+   Or, more simple solution like:
+
+   ```swift
+   struct ContentView: View {
+       @State private var wakeUp = defaultWakeTime
+       @State private var sleepAmount = 8.0
+       @State private var coffeeAmount = 1
+       
+       var sleepTime:String {
+           let t = calculateBedtime()
+           return t
+       }
+       
+       static var defaultWakeTime: Date {
+           var components = DateComponents()
+           components.hour = 7
+           components.minute = 0
+           return Calendar.current.date(from: components) ?? Date()
+       }
+   
+       var body: some View {
+           NavigationView {
+               Form {
+                   Section(header: Text("When do you want to wake up?")) {
+                       
+                       DatePicker("Please enter a time", selection: $wakeUp, displayedComponents:.hourAndMinute)
+                           .labelsHidden()
+                           .datePickerStyle(WheelDatePickerStyle())
+                   }
+                   
+                   VStack(alignment: .leading, spacing: 0) {
+                       Text("Desired amount of sleep")
+                           .font(.headline)
+                       Stepper(value: $sleepAmount, in: 4...12, step: 0.25) {
+                           Text("\(sleepAmount, specifier: "%g") hours")
+                       }
+                   }
+                   
+                   VStack(alignment: .leading, spacing: 0) {
+                       Picker("Daily coffee intake", selection: $coffeeAmount) {
+                           ForEach(0 ..< 20) {index in
+                               if index < 1 {
+                                   Text("\(index) cup")
+                               } else {
+                                   Text("\(index) cups")
+                               }
+                           }
+                       }
+                   }
+                   
+                   Text("\(sleepTime)")
+               }
+               
+               .navigationTitle("BetterRest")
+           }
+       }
+       
+       
+       func calculateBedtime() -> String {
+           let model = SleepCalculator()
+           
+           let components = Calendar.current.dateComponents([.hour, .minute], from: wakeUp)
+           let hour = (components.hour ?? 0) * 60 * 60
+           let minute = (components.minute ?? 0) * 60
+           
+           do {
+               let prediction = try model.prediction(wake: Double(hour + minute), estimatedSleep: sleepAmount, coffee: Double(coffeeAmount))
+               let sleepTime = wakeUp - prediction.actualSleep
+   
+               let formatter = DateFormatter()
+               formatter.timeStyle = .short
+   
+               return formatter.string(from: sleepTime)
+           } catch {
+               return "Error"
+           }
+       }
+   }
+   ```
+
+   
+
+### Day 29 Project 5, part 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
