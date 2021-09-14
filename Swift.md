@@ -1,7 +1,3 @@
-```
-
-```
-
 # Swift
 
 ### Day 6: Closures, part one
