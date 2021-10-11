@@ -224,6 +224,10 @@ class Solution {
 
         
         var result:[[Int]] = []
+        if count < 4 {
+            return result
+        }
+        
         for j in 0..<count - 3 {
             if j == 0 || (j > 0 && sNums[j] != sNums[j - 1]) {
                 for i in j+1..<count-2 {
@@ -256,4 +260,136 @@ class Solution {
         
         return result
     }
+    
+    /**
+     Given the head of a linked list, remove the nth node from the end of the list and return its head.
+     */
+    var removeNthFromEnd_data = [1,2]
+    var removeNthFromEnd_n = 2
+    func removeNthFromEnd(_ head: ListNode?, _ n: Int) -> ListNode? {
+        var list:[Int] = []
+        var tHead = head
+        while tHead != nil {
+            list.append(tHead!.val)
+            tHead = tHead?.next
+        }
+        
+        let index = list.count - n
+        list.remove(at: index)
+        
+        /**
+         这种方式有点尴尬，不如直接遍历出列表的长度后计算出位置，然后再遍历到该位置，这样就不用创建新的列表了。
+         但从提交的结果来看，这种方式执行速度会快一点。
+         如：removeNthFromEnd_1
+         */
+        
+        return createNthHead(data: list)
+    }
+    
+    func removeNthFromEnd_1(_ head: ListNode?, _ n: Int) -> ListNode? {
+        let dummy = ListNode()
+        dummy.next = head
+        
+        var count = 0
+        var first = head
+        while first != nil {
+            count += 1
+            first = first?.next
+        }
+        /**
+         如果长度等于 1 和删除头结点的时候需要单独判断，其实我们只需要在 head 前边加一个空节点，就可以避免单独判断。
+         */
+        
+        var length = count - n
+        first = dummy
+        while length > 0 {
+            length -= 1
+            first = first?.next
+        }
+        
+        first?.next = first?.next?.next
+        
+        return dummy.next
+    }
+    
+    func removeNthFromEnd_2(_ head: ListNode?, _ n: Int) -> ListNode? {
+        /**
+         只遍历一次的方式，定义2个指针，间隔n个距离，然后走下去。
+         这种算法，速度更快
+         */
+        let dummy = ListNode()
+        dummy.next = head
+        var first:ListNode? = dummy
+        var second:ListNode? = dummy
+        
+        for _ in 0...n {
+            first = first?.next
+        }
+        while first != nil {
+            first = first?.next
+            second = second?.next
+        }
+        
+        second?.next = second?.next?.next
+
+        
+        return dummy.next
+    }
+    
+    func removeNthFromEnd_3(_ head: ListNode?, _ n: Int) -> ListNode? {
+        /**
+         这种算法不如removeNthFromEnd_2快，但思想比较有意思
+         */
+        var list:[ListNode] = []
+        var h = head
+        var len = 0
+        while h != nil {
+            list.append(h!)
+            h = h?.next
+            len += 1
+        }
+        if len == 1 {
+            return nil
+        }
+        
+        let remove = len - n
+        if remove == 0 {
+            return head?.next
+        }
+        
+        let r = list[remove - 1]
+        r.next = r.next?.next
+        
+        
+        return head
+    }
+    
+    func createNthHead(data:[Int]) -> ListNode? {
+        var head:ListNode? = nil
+        var tail:ListNode? = nil
+
+        for item in data {
+            let t = ListNode(item)
+            if head == nil {
+                head = t
+            }
+            
+            if let tTail = tail {
+                tTail.next = t
+            }
+            tail = t
+        }
+        return head
+    }
 }
+
+
+
+public class ListNode {
+    public var val: Int
+    public var next: ListNode?
+    public init() { self.val = 0; self.next = nil; }
+    public init(_ val: Int) { self.val = val; self.next = nil; }
+    public init(_ val: Int, _ next: ListNode?) { self.val = val; self.next = next; }
+ }
+ 
