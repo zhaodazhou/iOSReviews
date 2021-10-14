@@ -381,6 +381,169 @@ class Solution {
         }
         return head
     }
+    
+    /**
+     Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
+
+     An input string is valid if:
+
+     Open brackets must be closed by the same type of brackets.
+     Open brackets must be closed in the correct order.
+     */
+    var isValid_s = "([{}]"
+    func isValid(_ s: String) -> Bool {
+        var list:[Character] = []
+        
+        for item in s {
+            switch item {
+            case "(", "[", "{":
+                list.append(item)
+            case ")", "]", "}":
+                let t = list.popLast()
+//                list.removeLast() 与 popLast 的区别，前者如果是操作empty数组，那会crash；后者不会
+                if t == nil {
+                    return false
+                }
+                
+                
+                if (t == "(" && item == ")") ||
+                    (t == "[" && item == "]") ||
+                    (t == "{" && item == "}")
+                {
+                    continue
+                } else {
+                    return false
+                }
+            default:
+                continue
+            }
+        }
+        
+        if list.isEmpty {
+            return true
+        }
+        
+        return false
+    }
+    
+    /**
+     Merge two sorted linked lists and return it as a sorted list. The list should be made by splicing together the nodes of the first two lists.
+     */
+    var mergeTwoLists_l1 = [-9, 3]
+    var mergeTwoLists_l2 = [5, 7]
+    func mergeTwoLists(_ l1: ListNode?, _ l2: ListNode?) -> ListNode? {
+        /**
+         Input: l1 = [1,2,4], l2 = [1,3,4]
+         Output: [1,1,2,3,4,4]
+         */
+        
+        if l1 == nil {
+            return l2
+        }
+        if l2 == nil {
+            return l1
+        }
+        
+        let head:ListNode = ListNode()
+        var tail:ListNode?
+        var first = l1
+        var second = l2
+        while first != nil && second != nil {
+            if tail == nil {
+                tail = head
+            }
+            if first!.val <= second!.val {
+                tail?.next = ListNode(first!.val)
+                first = first?.next
+            } else  {
+                tail?.next = ListNode(second!.val)
+                second = second?.next
+            }
+            tail = tail?.next
+        }
+        
+        while first != nil {
+            tail?.next = ListNode(first!.val)
+            first = first?.next
+            tail = tail?.next
+        }
+        
+        while second != nil {
+            tail?.next = ListNode(second!.val)
+            second = second?.next
+            tail = tail?.next
+        }
+        
+        return head.next
+    }
+    
+    func mergeTwoLists_2(_ l1: ListNode?, _ l2: ListNode?) -> ListNode? {
+        /**
+         与mergeTwoLists相比，主要优化在空间优化、与最后一步的判断方式
+         */
+        if l1 == nil {
+            return l2
+        }
+        if l2 == nil {
+            return l1
+        }
+        
+        var head:ListNode = ListNode(0)
+        let ans = head
+        var first = l1
+        var second = l2
+        while first != nil && second != nil {
+            if first!.val <= second!.val {
+                head.next = first
+                head = head.next!
+                first = first!.next
+            } else  {
+                head.next = second
+                head = head.next!
+                second = second!.next
+            }
+        }
+        
+        if first == nil {
+            head.next = second
+        }
+        if second == nil {
+            head.next = first
+        }
+        
+        return ans.next
+    }
+    
+    func mergeTwoLists_1(_ l1: ListNode?, _ l2: ListNode?) -> ListNode? {
+        /**
+        递归解法
+         */
+        
+        if l1 == nil {
+            return l2
+        }
+        if l2 == nil {
+            return l1
+        }
+        
+        if l1!.val < l2!.val {
+            l1?.next = mergeTwoLists_1(l1!.next, l2)
+            return l1
+        } else {
+            l2?.next = mergeTwoLists_1(l1, l2!.next)
+            return l2
+        }
+    }
+    
+    /**
+     Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses.
+     Input: n = 3
+     Output: ["((()))","(()())","(())()","()(())","()()()"]
+     */
+    var generateParenthesis_n = 3
+    func generateParenthesis(_ n: Int) -> [String] {
+        return []
+    }
 }
 
 
