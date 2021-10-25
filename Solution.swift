@@ -542,11 +542,82 @@ class Solution {
      */
     var generateParenthesis_n = 3
     func generateParenthesis(_ n: Int) -> [String] {
-        return []
+        let orignal = LeafNode()
+        createParenthTree(parentNode: orignal, n: n * 2)
+        
+        var result:[String] = []
+        depthSearch(parentNode: orignal.leftNext, sign: "", value: 0, result: &result)
+        depthSearch(parentNode: orignal.rightNext, sign: "", value: 0, result: &result)
+        
+        return result
+    }
+    
+    func generateParenthesis_1(_ n: Int) -> [String] {
+        var result:[String] = []
+        if n == 0 {
+            result.append("")
+        } else {
+            for a in 0..<n {
+                for leftV in generateParenthesis_1(a) {
+                    for rightV in generateParenthesis_1(n - 1 - a) {
+                        result.append("(" + leftV + ")" + rightV)
+                    }
+                }
+            }
+        }
+        
+        
+        
+        return result
+    }
+    
+    func depthSearch(parentNode:LeafNode?, sign: String, value:Int, result: inout [String]) {
+        if value > 0 {
+            return
+        }
+        if parentNode == nil {
+            if value == 0 {
+                if !result.contains(sign) {
+                    result.append(sign)
+                }
+            }
+            return
+        }
+        
+        depthSearch(parentNode: parentNode?.leftNext, sign: sign + "(", value: value - 1, result: &result)
+        depthSearch(parentNode: parentNode?.rightNext, sign: sign + ")", value: value + 1, result: &result)
+    }
+    
+    func createParenthTree(parentNode:LeafNode, n:Int) {
+        if n <= 0 {
+            return
+        }
+        
+        let leftNode = LeafNode()
+        leftNode.val = -1
+        leftNode.sign = "("
+        
+        let rightNode = LeafNode()
+        rightNode.val = 1
+        rightNode.sign = ")"
+        
+        parentNode.leftNext = leftNode
+        parentNode.rightNext = rightNode
+        
+        
+        createParenthTree(parentNode: leftNode, n: n - 1)
+        createParenthTree(parentNode: rightNode, n: n - 1)
     }
 }
 
-
+public class LeafNode {
+    public var val: Int = 0
+    public var totalVal: Int = 0
+    public var sign: String = ""
+    public var totalSign:String = ""
+    public var leftNext: LeafNode?
+    public var rightNext: LeafNode?
+ }
 
 public class ListNode {
     public var val: Int
