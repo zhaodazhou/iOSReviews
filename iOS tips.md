@@ -356,3 +356,145 @@ static NSNumberFormatter * numberFormat;
 }
 ```
 
+
+
+## 17. 启动图
+
+xcode10.3 新建的工程，在LaunchImage中添加了各尺寸的启动图，但就是效果不生效，原来还需要去配置文件中进行设置。
+
+具体是将 Asset Catalog Launch Image Set Name 这一项的值，设置为 LaunchImage，这样才行。
+
+
+
+## 18. 右滑返回上一个页面
+
+有些场景下，一级页面有导航栏，二级页面隐藏了导航栏，这种场景下，可能会在二级页面边缘右滑返回上一页面的功能会失效。这种情况下，可以通过设置交互手势来实现。
+
+具体如下：
+
+1. 继承协议 UIGestureRecognizerDelegate
+
+2. 在viewWillAppear中实现代理绑定
+
+   ```
+   self.navigationController.interactivePopGestureRecognizer.delegate = self;
+   ```
+
+   实现代理函数
+
+   ```
+   - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+   {
+     //判断是否是一级视图，若是则关闭滑动返回手势
+     if (self.navigationController.viewControllers.count == 1)  {
+   			return NO;
+     }
+     else {
+   			return YES;
+     }
+   }
+   ```
+
+   
+
+3. 在viewWillDisappear中解除绑定
+
+   ```
+   self.navigationController.interactivePopGestureRecognizer.delegate = nil;
+   ```
+
+
+
+
+
+
+## 19. iOS 多语言
+
+读取多语言的宏方法是：
+
+```
+NSLocalizedString(key, comment)
+```
+
+对应的是：
+
+```
+[NSBundle.mainBundle localizedStringForKey:(key) value:@"" table:nil]
+```
+
+所以，若要在应用内显示特定的语言，需要先使mainBundle对象读取相应的语言配置，比如：
+
+```
+NSString * hansBundlePath = [[NSBundle mainBundle] pathForResource:@"zh-Hans" ofType:@"lproj"]; // 加载简体中文的配置
+NSBundle * hansBundle = [NSBundle bundleWithPath:hansBundlePath];
+```
+
+
+
+为了方便，可以利用category技术在load方法中，通过object_setClass替换系统方法mainBundle，使其在特定条件下加载特定的语言配置。
+
+```
++ (void)load {
+  static dispatch_once_t onceToken;
+
+  dispatch_once(&onceToken, ^{
+     object_setClass([NSBundle mainBundle], [LanguageBundle class]);
+  });
+
+}
+```
+
+LanguageBundle的定义可以是下面这样：
+
+```
+@interface LanguageBundle : NSBundle
+
+@end
+
+static NSBundle * enBundle;
+static NSBundle * hansBundle;
+
+@implementation LanguageBundle
+
+- (NSString *)localizedStringForKey:(NSString *)key value:(NSString *)value table:(NSString *)tableName {
+    if ([LanguageBundle cl_mainBundle]) {
+        return [[LanguageBundle cl_mainBundle] localizedStringForKey:key value:value table:tableName]
+        ;
+    } else {
+        return [super localizedStringForKey:key value:value table:tableName];
+    }
+}
+
++ (NSBundle *)cl_mainBundle {
+    if (/** 判断条件，比如，用户设置过显示中文 */) {
+            if (!hansBundle) {
+                NSString * hansBundlePath = [[NSBundle mainBundle] pathForResource:@"zh-Hans" ofType:@"lproj"];
+                hansBundle = [NSBundle bundleWithPath:hansBundlePath];
+            }
+            return hansBundle;
+     } else {
+            if (!enBundle) {
+                NSString * enBundlePath = [[NSBundle mainBundle] pathForResource:@"en" ofType:@"lproj"];
+                enBundle = [NSBundle bundleWithPath:enBundlePath];
+            }
+            return enBundle;
+     }
+}
+
+@end
+```
+
+
+
+另外，判断当前系统语言，这个不代表APP内显示的语言。
+
+如下：
+
+```
+NSArray * appLanguages = [NSLocale preferredLanguages];
+//判断第一个
+if ([[appLanguages firstObject] hasPrefix:@"zh-Han"]) {
+     // 简体中文
+}
+```
+
