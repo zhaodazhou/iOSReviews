@@ -498,3 +498,28 @@ if ([[appLanguages firstObject] hasPrefix:@"zh-Han"]) {
 }
 ```
 
+
+
+## 20. UIView设置背景色值
+
+一般可以通过图片生成UIColor对象后再赋值，如下：
+
+```
+self.bgView.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"pagebg"]];
+```
+
+这种情况在bgView存在拉伸的情况下，边缘可能会有循环拉伸情况，（或者说bgView拉伸了，但图片没有拉伸）
+
+
+
+这种情况可以通过如下方式解决：
+
+```
+  UIImage * image = [UIImage imageNamed:@"pagebg"];
+
+  self.bgView.layer.contents = (__bridge id _Nullable)image.CGImage;
+
+```
+
+对UIView的layer的contents进行赋值，可以应付拉伸的情况。
+
