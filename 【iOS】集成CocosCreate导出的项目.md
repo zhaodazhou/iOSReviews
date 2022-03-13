@@ -28,7 +28,7 @@
 
 此次集成多个Cocos项目。
 
-
+Always Search User Paths  设置为YES
 
 ### 编译问题
 
