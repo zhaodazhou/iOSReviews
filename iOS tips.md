@@ -4,7 +4,7 @@
 
 在自定义导航栏右键时，在某条件成立时，按钮可响应点击事件，尝试如下：
 
-```
+```objective-c
 self.saveBtn = [self getBtn:MKString(@"Post_Button_Save") action:@selector(onSave)];
 [self.saveBtn setEnabled:NO];
 self.saveBtn.alpha = 0.4;
@@ -25,8 +25,6 @@ self.saveBtn.alpha = 0.4;
 
 这样是可以的。
 
-
-
 ## 2.UILabel上显示字符串尾部空格字符
 
 UILabel对字符串的尾部有默认的trim功能，为了某些显示效果，需要其他的办法来实现UILabel，如下：
@@ -36,11 +34,10 @@ NSString * title = [NSString stringWithFormat:@" %d ", num];
 
 NSMutableParagraphStyle * style = [[NSMutableParagraphStyle alloc] init];
 NSMutableAttributedString * attribut = [[NSMutableAttributedString alloc]
-                                                initWithString:title                               attributes:@{NSForegroundColorAttributeName:ColorString(@"#ffffff"),                                                          							NSParagraphStyleAttributeName:style}];
+                                                initWithString:title                               
+                                                attributes:@{NSForegroundColorAttributeName:ColorString(@"#ffffff"),                                                          							NSParagraphStyleAttributeName:style}];
 self.mLabel.attributedText = attribut;
 ```
-
-
 
 ## 3.UIScrollView的Masonry布局
 
@@ -97,8 +94,6 @@ UIScrollView是可以左右上下滑动的控件，在用Masonry对在其之上�
 
 通过以上方式，不需要再设置scrollview的contentSize就可以实现滑动，而且是正好的滑动。
 
-
-
 ## 4.view画圆角
 
 ```objective-c
@@ -109,25 +104,15 @@ layer.path = path.CGPath;
 containView.layer.mask = layer;
 ```
 
-
-
 ## 5.UIActivityViewController
 
 可以用此类调起系统的分享界面，其中包括了第三方APP的分享功能
-
-
-
-
 
 ## 6.CocoPads中的文件夹命名规则
 
 是根据库的名称，比如 AFNetworking 的md5后字符串为 A75D452377F3996BDC4B623A5DF25820，其在Specs的目录位置即为 a/7/5/AFNetworking
 
-
-
 这样的命名好处是，查找快。
-
-
 
 ## 7.导航栏的隐藏与显示
 
@@ -158,8 +143,6 @@ containView.layer.mask = layer;
 }
 ```
 
-
-
 ## 8.在release模式下进行真机调试
 
 1：编辑工程的scheme模式，将【Run】模式下的【Build Configuration】选项设置为Release模式； 
@@ -167,8 +150,6 @@ containView.layer.mask = layer;
 2：设置工程的【Build Settings】，将【Code Signing Identity】与【Provisioning Profile】的Release的设置为相应的开发者cer和pro证书。
 
 这个，就能在release模式下进行真机调试，毕竟有些问题在debug模式下是不复现的，而在release模式下却必现（比如对象的延迟释放问题）。
-
-
 
 ## 9.transitionFromViewController切换controller时的问题
 
@@ -185,8 +166,6 @@ containView.layer.mask = layer;
 
 如果有2个controller的viewWillAppear中有刷新页面之类的功能，那在这2个controller之间快速切换时，极易容易发生白屏问题，其中finished变量在平常是yes，但发生白屏的那次，是no；而且在之后也不会再从白屏中恢复过来。
 
-
-
 ## 10.设置button的图片与文字的左右关系
 
 可以通过titleEdgeInsets与imageEdgeInsets来实现：
@@ -202,15 +181,11 @@ CGFloat labelWidth = btn.titleLabel.intrinsicContentSize.width; //注意不能�
 
 当然，这种方式也可以用来设置上下之间的关系。
 
-
-
 更简单的方式如下：
 
 ```objective-c
 btn.semanticContentAttribute = UISemanticContentAttributeForceRightToLeft;
 ```
-
-
 
 ## 11. transitionFromViewController
 
@@ -223,8 +198,6 @@ iOS自带的切换controller的方式有2个问题。
 1. 在iOS14上，completion的回调有时候finished为false；
 2. completion的回调比较慢，这在一些连续回退页面的场景中会出现意外的bug。
 
-
-
 ## 12. NSTimer
 
 计时器的block对业务会有强引用，即使用了weakSelf。
@@ -235,7 +208,7 @@ iOS自带的切换controller的方式有2个问题。
 
 2. 通过fire()来重新计时。比如：
 
-   ```
+   ```Objective-C
    if (self.timer) {
            [self.timer fire];
        } else {
@@ -246,16 +219,11 @@ iOS自带的切换controller的方式有2个问题。
        }
    ```
 
-
-
-
-
-
 ## 13. iOS 字典初始化赋值一记
 
 有例如下：
 
-```
+```Objective-C
 int index = 1, size = 1, type = 1;
     NSString * shopId = nil;
     NSString * word = @"";
@@ -272,11 +240,7 @@ int index = 1, size = 1, type = 1;
 
 答案是2个，因为shopId为nil，中断了后续的赋值操作。
 
-
-
 同样的操作在Array上类似，nil值也会中断后续的赋值初始化动作。
-
-
 
 ## 14.货币国际化的显示
 
@@ -325,7 +289,7 @@ static NSNumberFormatter * numberFormat;
 
 尝试下来，应该如下设置：
 
-```
+```Objective-C
 [[NSLocale alloc] initWithLocaleIdentifier:@"ca_IT"];
 ```
 
@@ -356,15 +320,11 @@ static NSNumberFormatter * numberFormat;
 }
 ```
 
-
-
 ## 17. 启动图
 
 xcode10.3 新建的工程，在LaunchImage中添加了各尺寸的启动图，但就是效果不生效，原来还需要去配置文件中进行设置。
 
 具体是将 Asset Catalog Launch Image Set Name 这一项的值，设置为 LaunchImage，这样才行。
-
-
 
 ## 18. 右滑返回上一个页面
 
@@ -376,13 +336,13 @@ xcode10.3 新建的工程，在LaunchImage中添加了各尺寸的启动图，�
 
 2. 在viewWillAppear中实现代理绑定
 
-   ```
+   ```Objective-C
    self.navigationController.interactivePopGestureRecognizer.delegate = self;
    ```
 
    实现代理函数
 
-   ```
+   ```Objective-C
    - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
    {
      //判断是否是一级视图，若是则关闭滑动返回手势
@@ -395,45 +355,37 @@ xcode10.3 新建的工程，在LaunchImage中添加了各尺寸的启动图，�
    }
    ```
 
-   
 
 3. 在viewWillDisappear中解除绑定
 
-   ```
+   ```Objective-C
    self.navigationController.interactivePopGestureRecognizer.delegate = nil;
    ```
-
-
-
-
-
 
 ## 19. iOS 多语言
 
 读取多语言的宏方法是：
 
-```
+```Objective-C
 NSLocalizedString(key, comment)
 ```
 
 对应的是：
 
-```
+```Objective-C
 [NSBundle.mainBundle localizedStringForKey:(key) value:@"" table:nil]
 ```
 
 所以，若要在应用内显示特定的语言，需要先使mainBundle对象读取相应的语言配置，比如：
 
-```
+```Objective-C
 NSString * hansBundlePath = [[NSBundle mainBundle] pathForResource:@"zh-Hans" ofType:@"lproj"]; // 加载简体中文的配置
 NSBundle * hansBundle = [NSBundle bundleWithPath:hansBundlePath];
 ```
 
-
-
 为了方便，可以利用category技术在load方法中，通过object_setClass替换系统方法mainBundle，使其在特定条件下加载特定的语言配置。
 
-```
+```Objective-C
 + (void)load {
   static dispatch_once_t onceToken;
 
@@ -446,7 +398,7 @@ NSBundle * hansBundle = [NSBundle bundleWithPath:hansBundlePath];
 
 LanguageBundle的定义可以是下面这样：
 
-```
+```Objective-C
 @interface LanguageBundle : NSBundle
 
 @end
@@ -484,13 +436,11 @@ static NSBundle * hansBundle;
 @end
 ```
 
-
-
 另外，判断当前系统语言，这个不代表APP内显示的语言。
 
 如下：
 
-```
+```Objective-C
 NSArray * appLanguages = [NSLocale preferredLanguages];
 //判断第一个
 if ([[appLanguages firstObject] hasPrefix:@"zh-Han"]) {
@@ -498,23 +448,19 @@ if ([[appLanguages firstObject] hasPrefix:@"zh-Han"]) {
 }
 ```
 
-
-
 ## 20. UIView设置背景色值
 
 一般可以通过图片生成UIColor对象后再赋值，如下：
 
-```
+```Objective-C
 self.bgView.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"pagebg"]];
 ```
 
 这种情况在bgView存在拉伸的情况下，边缘可能会有循环拉伸情况，（或者说bgView拉伸了，但图片没有拉伸）
 
-
-
 这种情况可以通过如下方式解决：
 
-```
+```Objective-C
   UIImage * image = [UIImage imageNamed:@"pagebg"];
 
   self.bgView.layer.contents = (__bridge id _Nullable)image.CGImage;
@@ -522,4 +468,3 @@ self.bgView.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed
 ```
 
 对UIView的layer的contents进行赋值，可以应付拉伸的情况。
-
