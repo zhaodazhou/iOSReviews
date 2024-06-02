@@ -1,4 +1,4 @@
-ScrollView 中嵌套ScrollView 的滑动问题
+# ScrollView 中嵌套ScrollView 的滑动问题
 
 ScrollView中嵌套ScrollView时，滑动时，默认情况下，手指在哪个ScrollView上滑动，滑动事件就被其消费掉，滑动距离就在其上。
 
@@ -77,4 +77,3 @@ static NSString *const kObseverKeyContentOffset = @"contentOffset";
 
 @end
 ```
-
